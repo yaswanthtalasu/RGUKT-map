@@ -28,7 +28,7 @@ export const NODES = [
   { id: 'fj', name: 'Food Court Junction', type: 'junction', x: 596, y: 611 },
   { id: 'fc', name: 'Food Court', type: 'building', x: 634, y: 574 },
   { id: 'lib', name: 'Central Library', type: 'building', x: 493, y: 493 },
-  { id: 'fs', name: 'Food Stalls', type: 'building', x: 652, y: 454 },
+  { id: 'fs', type: 'hidden', x: 652, y: 454 },
   { id: 'din', name: 'Dining Hall', type: 'building', x: 560, y: 418 },
   { id: 'pj', name: 'Pond Junction', type: 'junction', x: 744, y: 491 },
   { id: 'adm', name: 'Administration Block (I3)', type: 'building', x: 841, y: 497 },
@@ -40,7 +40,7 @@ export const NODES = [
   { id: 'bh1', name: 'Boys Hostel – 1', type: 'building', x: 621, y: 248 },
   { id: 'bh2', name: 'Boys Hostel – 2', type: 'building', x: 803, y: 310 },
   { id: 'hej', name: 'Hostel East Junction', type: 'junction', x: 890, y: 343 },
-  { id: 'sq', name: 'Quarters Junction', type: 'junction', x: 913, y: 283 },
+  { id: 'sq', name: 'Food Stalls', type: 'building', x: 913, y: 283 },
   { id: 'nj', name: 'North Hostel Road', type: 'junction', x: 951, y: 174 },
 
   // ── Playground, girls hostels & SAC (east) ─────────────────

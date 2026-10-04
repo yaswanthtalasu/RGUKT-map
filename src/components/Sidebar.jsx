@@ -6,9 +6,9 @@ const JUNCTIONS = NODES.filter((n) => n.type === 'junction').sort(byName)
 
 const QUICK = [
   ['Gate → SAC', 'gate', 'sac'],
-  ['Gate → Food Stalls', 'gate', 'fs'],
+  ['Gate → Food Stalls', 'gate', 'sq'],
   ['Gate → AB2 Block', 'gate', 'a3'],
-  ['SAC → Food Stalls', 'sac', 'fs'],
+  ['SAC → Food Stalls', 'sac', 'sq'],
   ['Library → Girls Hostel 3', 'lib', 'gh3'],
 ]
 
