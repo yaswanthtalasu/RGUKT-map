@@ -1,4 +1,4 @@
-import { NODES, EDGES, METERS_PER_PIXEL, WALK_METERS_PER_MIN } from '../data/campus.js'
+import { NODES, EDGES, ALTERNATES, METERS_PER_PIXEL, WALK_METERS_PER_MIN } from '../data/campus.js'
 
 export const nodeById = Object.fromEntries(NODES.map((n) => [n.id, n]))
 
@@ -64,6 +64,18 @@ export function findRoute(fromId, toId) {
     meters,
     minutes: Math.max(1, Math.round(meters / WALK_METERS_PER_MIN)),
   }
+}
+
+/** Dotted alternative for routes listed in ALTERNATES: shortest path A -> via -> B. */
+export function findAlternative(fromId, toId) {
+  const alt = ALTERNATES.find(
+    ({ between: [a, b] }) => (a === fromId && b === toId) || (a === toId && b === fromId),
+  )
+  if (!alt) return null
+  const first = findRoute(fromId, alt.via)
+  const second = findRoute(alt.via, toId)
+  if (!first || !second) return null
+  return { points: [...first.points, ...second.points.slice(1)], via: nodeById[alt.via] }
 }
 
 export const pointsToPath = (pts) => pts.map(([x, y], i) => `${i ? 'L' : 'M'}${x} ${y}`).join(' ')

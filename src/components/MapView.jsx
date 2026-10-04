@@ -15,7 +15,9 @@ const TYPE_COLOR = {
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v))
 const ease = (t) => 1 - Math.pow(1 - t, 3)
 
-export default function MapView({ fromId, toId, hoverId, route, showRoads, focus, onPick, onHover }) {
+export default function MapView({
+  fromId, toId, hoverId, route, alt, showRoads, focus, fullscreen, onToggleFullscreen, onPick, onHover, onClear,
+}) {
   const wrapRef = useRef(null)
   const [size, setSize] = useState({ w: 0, h: 0 })
   const [view, setView] = useState({ x: 0, y: 0, k: 1 })
@@ -86,16 +88,23 @@ export default function MapView({ fromId, toId, hoverId, route, showRoads, focus
   }, [])
 
   // Initial fit / refit on resize when nothing is routed.
-  const routeRef = useRef(route)
-  routeRef.current = route
+  const fitPoints = useCallback(
+    (pts) => {
+      const xs = pts.map((p) => p[0])
+      const ys = pts.map((p) => p[1])
+      return fitBox(Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys))
+    },
+    [fitBox],
+  )
+  // the dotted alternative should stay in frame too
+  const framePts = useMemo(() => (route ? [...route.points, ...(alt ? alt.points : [])] : null), [route, alt])
+  const frameRef = useRef(framePts)
+  frameRef.current = framePts
   useEffect(() => {
     if (!size.w) return
     cancelAnimationFrame(tween.current)
-    const r = routeRef.current
-    if (r) {
-      const xs = r.points.map((p) => p[0])
-      const ys = r.points.map((p) => p[1])
-      setView(constrain(fitBox(Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys))))
+    if (frameRef.current) {
+      setView(constrain(fitPoints(frameRef.current)))
     } else {
       setView(constrain(overview()))
     }
@@ -104,12 +113,10 @@ export default function MapView({ fromId, toId, hoverId, route, showRoads, focus
 
   // Fly to the route whenever a new one appears.
   useEffect(() => {
-    if (!route || !size.w) return
-    const xs = route.points.map((p) => p[0])
-    const ys = route.points.map((p) => p[1])
-    animateTo(fitBox(Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)))
+    if (!framePts || !size.w) return
+    animateTo(fitPoints(framePts))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [route])
+  }, [framePts])
 
   // Fly to a single node (picked from the step list, or the first pick).
   useEffect(() => {
@@ -212,6 +219,7 @@ export default function MapView({ fromId, toId, hoverId, route, showRoads, focus
     }
     return len
   }, [route])
+  const altPath = useMemo(() => (alt ? pointsToPath(alt.points) : ''), [alt])
   const onRoute = useMemo(() => new Set(route ? route.stops.map((s) => s.id) : []), [route])
   const byId = (id) => NODES.find((n) => n.id === id)
   const fromNode = fromId && byId(fromId)
@@ -221,6 +229,7 @@ export default function MapView({ fromId, toId, hoverId, route, showRoads, focus
     n.id === fromId ||
     n.id === toId ||
     n.id === hoverId ||
+    n.id === alt?.via.id ||
     (route && onRoute.has(n.id) && n.type !== 'junction') ||
     (k >= 1.7 && n.type !== 'junction')
 
@@ -251,6 +260,13 @@ export default function MapView({ fromId, toId, hoverId, route, showRoads, focus
               {roads.map((r) => (
                 <path key={r.a + r.b} d={pointsToPath(r.pts)} strokeWidth={px(3)} />
               ))}
+            </g>
+          )}
+
+          {alt && (
+            <g key={altPath} className="alt-route">
+              <path d={altPath} className="alt-casing" strokeWidth={px(10)} strokeDasharray={`0.1 ${px(13)}`} />
+              <path d={altPath} className="alt-line" strokeWidth={px(6.5)} strokeDasharray={`0.1 ${px(13)}`} />
             </g>
           )}
 
@@ -287,7 +303,8 @@ export default function MapView({ fromId, toId, hoverId, route, showRoads, focus
               const isFrom = n.id === fromId
               const isTo = n.id === toId
               const active = isFrom || isTo
-              const r = active ? px(9) : onRoute.has(n.id) ? px(6.5) : n.type === 'junction' ? px(4.5) : px(6)
+              const isVia = !active && n.id === alt?.via.id
+              const r = active ? px(9) : isVia ? px(8) : onRoute.has(n.id) ? px(6.5) : n.type === 'junction' ? px(4.5) : px(6)
               return (
                 <g
                   key={n.id}
@@ -302,7 +319,7 @@ export default function MapView({ fromId, toId, hoverId, route, showRoads, focus
                     cx={n.x}
                     cy={n.y}
                     r={r}
-                    fill={isFrom ? '#16a34a' : isTo ? '#dc2626' : TYPE_COLOR[n.type]}
+                    fill={isFrom ? '#16a34a' : isTo ? '#dc2626' : isVia ? '#f59e0b' : TYPE_COLOR[n.type]}
                     stroke="#fff"
                     strokeWidth={px(active ? 3 : 2)}
                   />
@@ -314,7 +331,7 @@ export default function MapView({ fromId, toId, hoverId, route, showRoads, focus
           <g className="labels" pointerEvents="none">
             {VISIBLE_NODES.filter(labelFor).map((n) => {
               const active = n.id === fromId || n.id === toId
-              const tag = n.id === fromId ? 'START · ' : n.id === toId ? 'END · ' : ''
+              const tag = n.id === fromId ? 'START · ' : n.id === toId ? 'END · ' : n.id === alt?.via.id ? 'Alternative via ' : ''
               // keep labels on screen when a dot sits near the edge of the viewport
               const sx = view.x + n.x * k
               const anchor = sx > size.w - 130 ? 'end' : sx < 130 ? 'start' : 'middle'
@@ -347,18 +364,23 @@ export default function MapView({ fromId, toId, hoverId, route, showRoads, focus
         <button className="zoom-btn" aria-label="Zoom in" onClick={() => zoomAt(size.w / 2, size.h / 2, 1.5)}>＋</button>
         <button className="zoom-btn" aria-label="Zoom out" onClick={() => zoomAt(size.w / 2, size.h / 2, 1 / 1.5)}>－</button>
         <button
-          aria-label="Reset view"
-          onClick={() => {
-            if (route) {
-              const xs = route.points.map((p) => p[0])
-              const ys = route.points.map((p) => p[1])
-              animateTo(fitBox(Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)))
-            } else animateTo(overview())
-          }}
+          aria-label={fullscreen ? 'Exit full view' : 'Full view'}
+          title={fullscreen ? 'Exit full view' : 'Full view'}
+          onClick={onToggleFullscreen}
         >
-          ⤢
+          {fullscreen ? '✕' : '⤢'}
         </button>
       </div>
+
+      {fullscreen && (
+        <div className="fs-chip">
+          <span>
+            <b>{fromNode ? fromNode.name : 'Tap a start dot'}</b>
+            {fromNode && <> → <b>{toNode ? toNode.name : 'pick destination'}</b></>}
+          </span>
+          {fromNode && <button aria-label="Clear route" onClick={onClear}>✕</button>}
+        </div>
+      )}
 
       <div className="legend">
         <span><i style={{ background: TYPE_COLOR.gate }} />Gate</span>

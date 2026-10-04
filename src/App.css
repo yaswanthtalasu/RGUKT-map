@@ -110,6 +110,20 @@ button { cursor: pointer; }
 .step-name { font-weight: 600; }
 .step-dist { font-size: 12px; color: var(--muted); white-space: nowrap; }
 
+.alt-note { margin: 0; display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); }
+.alt-note svg { flex: none; }
+.alt-note line { stroke: #f59e0b; stroke-width: 5; stroke-linecap: round; stroke-dasharray: 0.1 9; }
+
+.fs-chip {
+  position: absolute; left: 14px; top: 14px; max-width: calc(100% - 84px);
+  display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 14px; font-size: 13px;
+  background: rgba(255, 255, 255, 0.95); border-radius: 999px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28);
+}
+.fs-chip span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fs-chip button { flex: none; width: 26px; height: 26px; border-radius: 50%; border: 0; background: #eef3f2; }
+
+.is-fullscreen .panel { display: none; }
+
 .quick h2 { margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chips button {
@@ -146,6 +160,10 @@ button { cursor: pointer; }
 
 .roads path { fill: none; stroke: #fde047; stroke-opacity: 0.85; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 6 5; }
 
+.alt-casing, .alt-line { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.alt-casing { stroke: #fff; }
+.alt-line { stroke: #f59e0b; }
+.alt-route { animation: alt-in 0.5s 0.9s backwards; }
 .route-casing, .route-line, .route-flow { fill: none; stroke-linecap: round; stroke-linejoin: round; }
 .route-casing { stroke: #fff; opacity: 0.95; }
 .route-line { stroke: var(--route); stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 1s ease-out forwards; }
@@ -168,6 +186,7 @@ button { cursor: pointer; }
 .legend span { display: flex; align-items: center; gap: 5px; }
 .legend i { width: 10px; height: 10px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); }
 
+@keyframes alt-in { from { opacity: 0; } }
 @keyframes draw { to { stroke-dashoffset: 0; } }
 @keyframes fade-in { to { opacity: 0.95; } }
 @keyframes flow { to { stroke-dashoffset: calc(var(--dash) * -1); } }

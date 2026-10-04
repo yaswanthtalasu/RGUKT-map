@@ -58,6 +58,11 @@ export const NODES = [
   { id: 's3', name: 'South Road End', type: 'junction', x: 1028, y: 1097 },
 ]
 
+// Extra dotted route shown next to the shortest one. Matches in either direction.
+export const ALTERNATES = [
+  { between: ['gate', 'sac'], via: 'yj' }, // Main Gate Circle <-> SAC, via Yogasala Road Junction
+]
+
 export const EDGES = [
   // Gate → academic blocks → central junction
   ['gate', 'a4', [[478, 972], [450, 940], [432, 912]]],

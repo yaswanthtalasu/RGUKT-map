@@ -35,7 +35,7 @@ function PlaceSelect({ label, dot, value, onChange }) {
 }
 
 export default function Sidebar({
-  fromId, toId, route, noRoute, showRoads,
+  fromId, toId, route, alt, noRoute, showRoads,
   onFrom, onTo, onSwap, onClear, onToggleRoads, onFocus, onQuick,
 }) {
   const hasAny = fromId || toId
@@ -68,6 +68,13 @@ export default function Sidebar({
       )}
       {fromId && !toId && <p className="hint-box">Start set. Now tap the destination dot on the map.</p>}
       {noRoute && <p className="hint-box warn">No road connects these two places yet.</p>}
+
+      {alt && (
+        <p className="alt-note">
+          <svg width="34" height="8" aria-hidden="true"><line x1="3" y1="4" x2="31" y2="4" /></svg>
+          <span>Alternative route via <b>{alt.via.name}</b> (dotted)</span>
+        </p>
+      )}
 
       {route && (
         <ol className="steps">
