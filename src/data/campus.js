@@ -17,7 +17,8 @@ export const WALK_METERS_PER_MIN = 75
 
 export const NODES = [
   // ── Entrance & academic blocks ─────────────────────────────
-  { id: 'gate', name: 'Main Gate Circle', type: 'gate', x: 499, y: 1004 },
+  { id: 'gate', name: 'Main Gate Circle', type: 'gate', x: 562, y: 1096 },
+  { id: 'rb', type: 'hidden', x: 499, y: 1004 }, // the roundabout inside the gate
   { id: 'a4', name: 'AB1 Block', type: 'building', x: 424, y: 896 },
   { id: 'acj', name: 'Academic Junction', type: 'junction', x: 424, y: 841 },
   { id: 'a3', name: 'AB2 Block', type: 'building', x: 407, y: 783 },
@@ -56,9 +57,9 @@ export const NODES = [
   { id: 'sac', name: 'SAC Auditorium', type: 'building', x: 1249, y: 348 },
 
   // ── South campus ───────────────────────────────────────────
-  { id: 's1', name: 'South Campus – West Gate', type: 'building', x: 880, y: 840 },
-  { id: 's2', name: 'South Campus – East Gate', type: 'building', x: 1052, y: 1013 },
-  { id: 's3', name: 'South Road End', type: 'junction', x: 1028, y: 1097 },
+  { id: 's1', name: 'SKLM Campus – West Gate', type: 'building', x: 880, y: 840 },
+  { id: 's2', name: 'SKLM Campus – East Gate', type: 'building', x: 1052, y: 1013 },
+  { id: 's3', name: 'SKLM Campus – Road End', type: 'junction', x: 1028, y: 1097 },
 ]
 
 // Extra dotted route shown next to the shortest one. Matches in either direction.
@@ -78,7 +79,8 @@ export const ALTERNATES = [
 
 export const EDGES = [
   // Gate → academic blocks → central junction
-  ['gate', 'a4', [[478, 972], [450, 940], [432, 912]]],
+  ['gate', 'rb', [[540, 1075], [515, 1037]]],
+  ['rb', 'a4', [[478, 972], [450, 940], [432, 912]]],
   ['a4', 'acj'],
   ['acj', 'r1', [[438, 825], [452, 800], [476, 772]]],
   ['r1', 'r2', [[518, 725]]],
