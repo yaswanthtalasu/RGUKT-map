@@ -70,23 +70,6 @@ export default function Sidebar({
       {noRoute && <p className="hint-box warn">No road connects these two places yet.</p>}
 
       {route && (
-        <section className="summary">
-          <div className="stat">
-            <strong>{route.minutes} min</strong>
-            <span>walk</span>
-          </div>
-          <div className="stat">
-            <strong>≈ {route.meters} m</strong>
-            <span>distance</span>
-          </div>
-          <div className="stat">
-            <strong>{stops.length}</strong>
-            <span>stops</span>
-          </div>
-        </section>
-      )}
-
-      {route && (
         <ol className="steps">
           {stops.map((s, i) => (
             <li key={s.id} className={i === 0 ? 'first' : i === stops.length - 1 ? 'last' : ''}>
