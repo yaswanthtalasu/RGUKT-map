@@ -1,4 +1,4 @@
-import { NODES, EDGES, ALTERNATES, METERS_PER_PIXEL, WALK_METERS_PER_MIN } from '../data/campus.js'
+import { NODES, EDGES, ALTERNATES, NO_ALTERNATE_EDGES, METERS_PER_PIXEL, WALK_METERS_PER_MIN } from '../data/campus.js'
 
 export const nodeById = Object.fromEntries(NODES.map((n) => [n.id, n]))
 
@@ -12,23 +12,23 @@ function polylineLength(pts) {
 
 // Each edge becomes two directed adjacency entries carrying the full road geometry.
 const adjacency = {}
-export const roads = EDGES.map(([a, b, via = []]) => {
+export const roads = EDGES.map(([a, b, via = [], cost = 1]) => {
   const A = nodeById[a]
   const B = nodeById[b]
   const pts = [[A.x, A.y], ...via, [B.x, B.y]]
   const length = polylineLength(pts)
   const key = [a, b].sort().join('|')
-  ;(adjacency[a] ||= []).push({ to: b, length, pts, key })
-  ;(adjacency[b] ||= []).push({ to: a, length, pts: [...pts].reverse(), key })
+  ;(adjacency[a] ||= []).push({ to: b, length, pts, key, cost })
+  ;(adjacency[b] ||= []).push({ to: a, length, pts: [...pts].reverse(), key, cost })
   return { a, b, pts, length }
 })
 
 /**
  * Dijkstra over the road graph. Returns null when no route exists.
  * `avoid` (Set of edge keys) + `avoidFactor` make those roads more expensive,
- * which is how alternative routes are found.
+ * which is how alternative routes are found. `blocked` roads are not used at all.
  */
-export function findRoute(fromId, toId, avoid = null, avoidFactor = 1) {
+export function findRoute(fromId, toId, avoid = null, avoidFactor = 1, blocked = null) {
   if (!nodeById[fromId] || !nodeById[toId]) return null
   const best = { [fromId]: 0 }
   const prev = {}
@@ -40,7 +40,8 @@ export function findRoute(fromId, toId, avoid = null, avoidFactor = 1) {
     todo.delete(cur)
     if (cur === toId) break
     for (const edge of adjacency[cur] || []) {
-      const d = best[cur] + edge.length * (avoid?.has(edge.key) ? avoidFactor : 1)
+      if (blocked?.has(edge.key)) continue
+      const d = best[cur] + edge.length * edge.cost * (avoid?.has(edge.key) ? avoidFactor : 1)
       if (d < (best[edge.to] ?? Infinity)) {
         best[edge.to] = d
         prev[edge.to] = { from: cur, edge }
@@ -102,8 +103,9 @@ export function findAlternative(fromId, toId, main = findRoute(fromId, toId)) {
   if (preferred) return preferred
 
   const used = new Set(main.edgeKeys)
+  const blocked = new Set(NO_ALTERNATE_EDGES.map(([a, b]) => [a, b].sort().join('|')).filter((k) => !used.has(k)))
   for (const factor of [2, 4, 10]) {
-    const alt = findRoute(fromId, toId, used, factor)
+    const alt = findRoute(fromId, toId, used, factor, blocked)
     if (!alt || alt.px > main.px * MAX_DETOUR) continue
     const unique = alt.edgeKeys.filter((k) => !used.has(k))
     const uniquePx = unique.reduce((sum, k) => sum + edgeLength[k], 0)

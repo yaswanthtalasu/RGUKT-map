@@ -6,6 +6,8 @@
 //
 // EDGES are [from, to, via?]. `via` is a list of [x, y] points the road bends through,
 // so the drawn route hugs the real road instead of cutting straight between two dots.
+// An optional 4th item is a routing-cost multiplier (default 1): the road is still drawn at its
+// true length, but the shortest-path search treats it as longer, so it is the less-preferred way.
 
 export const MAP_SIZE = { width: 1600, height: 1107 }
 
@@ -23,6 +25,7 @@ export const NODES = [
   { id: 'a2', name: 'AB3 Block', type: 'building', x: 488, y: 673 },
   { id: 'r1', type: 'hidden', x: 500, y: 750 },
   { id: 'r2', type: 'hidden', x: 540, y: 700 },
+  { id: 'sj', type: 'hidden', x: 1219, y: 441 }, // where the lane up to the SAC leaves the girls-hostel road
 
   // ── Central spine ──────────────────────────────────────────
   { id: 'fj', name: 'Food Court Junction', type: 'junction', x: 596, y: 611 },
@@ -59,6 +62,16 @@ export const NODES = [
 ]
 
 // Extra dotted route shown next to the shortest one. Matches in either direction.
+// Roads that may be part of the main route but are never offered as a dotted detour
+// (the footpath loop through the academic-block yards).
+export const NO_ALTERNATE_EDGES = [
+  ['acj', 'a3'],
+  ['a3', 'acy'],
+  ['acy', 'r1'],
+  ['acy', 'a2'],
+  ['a2', 'r2'],
+]
+
 export const ALTERNATES = [
   { between: ['gate', 'sac'], via: 'yj' }, // Main Gate Circle <-> SAC, via Yogasala Road Junction
 ]
@@ -103,9 +116,10 @@ export const EDGES = [
   ['pgn', 'sac', [[1225, 300]]],
   ['yj', 'gj', [[1030, 490], [1045, 440]]],
   ['gj', 'gh1'],
-  ['gh1', 'gh2', [[1205, 433]]],
+  ['gh1', 'sj', [[1205, 433]]],
+  ['sj', 'gh2'],
   ['gh2', 'gh3'],
-  ['gh2', 'sac', [[1268, 415]]],
+  ['sj', 'sac', [[1233, 417], [1245, 369]], 1.6], // keeps the playground approach as the main SAC route
 
   // South campus
   ['yj', 's1', [[950, 540], [918, 560], [908, 650], [893, 760]]],
