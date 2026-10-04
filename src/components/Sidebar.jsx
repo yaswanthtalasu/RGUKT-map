@@ -72,7 +72,9 @@ export default function Sidebar({
       {alt && (
         <p className="alt-note">
           <svg width="34" height="8" aria-hidden="true"><line x1="3" y1="4" x2="31" y2="4" /></svg>
-          <span>Alternative route via <b>{alt.via.name}</b> (dotted)</span>
+          <span>
+            Alternative route{alt.via && <> via <b>{alt.via.name}</b></>} (dotted)
+          </span>
         </p>
       )}
 

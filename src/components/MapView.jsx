@@ -229,7 +229,7 @@ export default function MapView({
     n.id === fromId ||
     n.id === toId ||
     n.id === hoverId ||
-    n.id === alt?.via.id ||
+    n.id === alt?.via?.id ||
     (route && onRoute.has(n.id) && n.type !== 'junction') ||
     (k >= 1.7 && n.type !== 'junction')
 
@@ -303,7 +303,7 @@ export default function MapView({
               const isFrom = n.id === fromId
               const isTo = n.id === toId
               const active = isFrom || isTo
-              const isVia = !active && n.id === alt?.via.id
+              const isVia = !active && n.id === alt?.via?.id
               const r = active ? px(9) : isVia ? px(8) : onRoute.has(n.id) ? px(6.5) : n.type === 'junction' ? px(4.5) : px(6)
               return (
                 <g
@@ -331,7 +331,7 @@ export default function MapView({
           <g className="labels" pointerEvents="none">
             {VISIBLE_NODES.filter(labelFor).map((n) => {
               const active = n.id === fromId || n.id === toId
-              const tag = n.id === fromId ? 'START · ' : n.id === toId ? 'END · ' : n.id === alt?.via.id ? 'Alternative via ' : ''
+              const tag = n.id === fromId ? 'START · ' : n.id === toId ? 'END · ' : n.id === alt?.via?.id ? 'Alternative via ' : ''
               // keep labels on screen when a dot sits near the edge of the viewport
               const sx = view.x + n.x * k
               const anchor = sx > size.w - 130 ? 'end' : sx < 130 ? 'start' : 'middle'

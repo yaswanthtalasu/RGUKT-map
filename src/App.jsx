@@ -12,7 +12,7 @@ export default function App() {
   const [fullscreen, setFullscreen] = useState(false)
 
   const route = useMemo(() => (fromId && toId ? findRoute(fromId, toId) : null), [fromId, toId])
-  const alt = useMemo(() => (fromId && toId ? findAlternative(fromId, toId) : null), [fromId, toId])
+  const alt = useMemo(() => (fromId && toId ? findAlternative(fromId, toId, route) : null), [fromId, toId, route])
   const noRoute = fromId && toId && !route
 
   // Map clicks: 1st = start, 2nd = destination, 3rd starts over with a new start.
