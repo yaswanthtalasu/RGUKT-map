@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import MapView from './components/MapView.jsx'
 import Sidebar from './components/Sidebar.jsx'
-import { findAlternative, findRoute } from './lib/graph.js'
+import { LIVE_ID, clearLiveStart, findAlternative, findRoute, setLiveStart } from './lib/graph.js'
+import useLiveLocation from './lib/useLiveLocation.js'
 
 export default function App() {
   const [fromId, setFromId] = useState(null)
@@ -11,9 +12,29 @@ export default function App() {
   const [focus, setFocus] = useState(null)
   const [fullscreen, setFullscreen] = useState(false)
 
-  const route = useMemo(() => (fromId && toId ? findRoute(fromId, toId) : null), [fromId, toId])
+  // "My live location" is a special start: watch GPS while it is selected.
+  const liveOn = fromId === LIVE_ID
+  const { status: liveStatus, fix, km: liveKm } = useLiveLocation(liveOn)
+  const liveSnap = useMemo(() => {
+    if (liveOn && fix) return setLiveStart(fix.x, fix.y)
+    clearLiveStart()
+    return null
+  }, [liveOn, fix])
+  const live = liveOn ? { status: liveStatus, fix, snap: liveSnap, km: liveKm } : null
+
+  // First fix with no destination yet: show the student where they are.
+  const hadSnap = liveSnap !== null
+  useEffect(() => {
+    if (hadSnap && !toId) setFocus({ id: LIVE_ID, n: Date.now() })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hadSnap])
+
+  const route = useMemo(
+    () => (fromId && toId && (!liveOn || liveSnap) ? findRoute(fromId, toId) : null),
+    [fromId, toId, liveOn, liveSnap],
+  )
   const alt = useMemo(() => (fromId && toId ? findAlternative(fromId, toId, route) : null), [fromId, toId, route])
-  const noRoute = fromId && toId && !route
+  const noRoute = fromId && toId && !route && (!liveOn || liveSnap)
 
   // Map clicks: 1st = start, 2nd = destination, 3rd starts over with a new start.
   const pick = (id) => {
@@ -26,6 +47,7 @@ export default function App() {
   }
 
   const swap = () => {
+    if (liveOn) return
     setFromId(toId)
     setToId(fromId)
   }
@@ -63,6 +85,7 @@ export default function App() {
         toId={toId}
         route={route}
         alt={alt}
+        live={live}
         noRoute={noRoute}
         showRoads={showRoads}
         onFrom={setFromId}
@@ -82,6 +105,8 @@ export default function App() {
         hoverId={hoverId}
         route={route}
         alt={alt}
+        live={live}
+        routeKey={`${fromId}|${toId}|${route ? 1 : 0}`}
         showRoads={showRoads}
         focus={focus}
         fullscreen={fullscreen}

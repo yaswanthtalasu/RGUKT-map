@@ -1,4 +1,5 @@
 import { NODES } from '../data/campus.js'
+import { LIVE_ID } from '../lib/graph.js'
 
 const byName = (a, b) => a.name.localeCompare(b.name)
 const PLACES = NODES.filter((n) => n.type !== 'hidden' && n.type !== 'junction').sort(byName)
@@ -12,13 +13,14 @@ const QUICK = [
   ['Library → Girls Hostel 3', 'lib', 'gh3'],
 ]
 
-function PlaceSelect({ label, dot, value, onChange }) {
+function PlaceSelect({ label, dot, value, onChange, withLive = false }) {
   return (
     <label className="field">
       <span className={`dot ${dot}`} aria-hidden="true" />
       <span className="field-label">{label}</span>
       <select value={value || ''} onChange={(e) => onChange(e.target.value || null)}>
         <option value="">Select or tap the map…</option>
+        {withLive && <option value={LIVE_ID}>📍 My live location</option>}
         <optgroup label="Places">
           {PLACES.map((n) => (
             <option key={n.id} value={n.id}>{n.name}</option>
@@ -34,8 +36,31 @@ function PlaceSelect({ label, dot, value, onChange }) {
   )
 }
 
+function LiveStatus({ live, hasRoute, hasTo }) {
+  const { status, fix, km } = live
+  if (status === 'locating') return <p className="hint-box">📍 Finding your location… allow location access if your browser asks.</p>
+  if (status === 'denied')
+    return <p className="hint-box warn">Location access is blocked. Allow it in your browser settings, or choose a start point instead.</p>
+  if (status === 'unavailable')
+    return <p className="hint-box warn">Couldn’t get your location (needs GPS and a secure https page). Choose a start point instead.</p>
+  if (status === 'outside')
+    return (
+      <p className="hint-box warn">
+        You’re outside the campus area{km ? ` (about ${km < 10 ? km.toFixed(1) : Math.round(km)} km away)` : ''}. Live location works once
+        you’re on campus — choose a start point instead.
+      </p>
+    )
+  if (!fix) return null
+  return (
+    <p className="hint-box live">
+      <span className="live-dot" /> Live location on{fix.accuracy ? ` (±${Math.round(fix.accuracy)} m)` : ''}.{' '}
+      {hasTo ? (hasRoute ? 'The route updates as you walk.' : '') : 'Now pick your destination.'}
+    </p>
+  )
+}
+
 export default function Sidebar({
-  fromId, toId, route, alt, noRoute, showRoads,
+  fromId, toId, route, alt, live, noRoute, showRoads,
   onFrom, onTo, onSwap, onClear, onToggleRoads, onFocus, onQuick,
 }) {
   const hasAny = fromId || toId
@@ -53,7 +78,7 @@ export default function Sidebar({
 
       <div className="pickers">
         <div className="fields">
-          <PlaceSelect label="From" dot="from" value={fromId} onChange={onFrom} />
+          <PlaceSelect label="From" dot="from" value={fromId} onChange={onFrom} withLive />
           <PlaceSelect label="To" dot="to" value={toId} onChange={onTo} />
         </div>
         <button className="icon-btn" onClick={onSwap} disabled={!hasAny} aria-label="Swap start and destination" title="Swap">
@@ -62,11 +87,15 @@ export default function Sidebar({
       </div>
 
       {!hasAny && (
-        <p className="hint-box">
-          Tap any <b>dot</b> on the map to set your start, then tap another for your destination — or use the lists above.
-        </p>
+        <div className="hint-box">
+          <p>
+            Tap any <b>dot</b> on the map to set your start, then tap another for your destination — or use the lists above.
+          </p>
+          <button className="live-btn" onClick={() => onFrom(LIVE_ID)}>📍 Use my live location as start</button>
+        </div>
       )}
-      {fromId && !toId && <p className="hint-box">Start set. Now tap the destination dot on the map.</p>}
+      {live && <LiveStatus live={live} hasRoute={!!route} hasTo={!!toId} />}
+      {fromId && !toId && !live && <p className="hint-box">Start set. Now tap the destination dot on the map.</p>}
       {noRoute && <p className="hint-box warn">No road connects these two places yet.</p>}
 
       {alt && (

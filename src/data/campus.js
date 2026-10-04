@@ -43,9 +43,9 @@ export const NODES = [
   { id: 'hj', name: 'Hostel Junction', type: 'junction', x: 711, y: 280 },
   { id: 'bh1', name: 'Boys Hostel – 1', type: 'building', x: 621, y: 248 },
   { id: 'bh2', name: 'Boys Hostel – 2', type: 'building', x: 803, y: 310 },
-  { id: 'hej', name: 'Hostel East Junction', type: 'junction', x: 890, y: 343 },
+  { id: 'hej', name: 'Faculty Quarters 2', type: 'junction', x: 890, y: 343 },
   { id: 'sq', name: 'Food Stalls', type: 'building', x: 913, y: 283 },
-  { id: 'nj', name: 'North Hostel Road', type: 'junction', x: 951, y: 174 },
+  { id: 'nj', name: 'Faculty Quarters Junction 2', type: 'junction', x: 951, y: 174 },
 
   // ── Playground, girls hostels & SAC (east) ─────────────────
   { id: 'pgw', name: 'Playground (West)', type: 'ground', x: 1045, y: 306 },

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { MAP_SIZE, NODES } from '../data/campus.js'
-import { pointsToPath, roads } from '../lib/graph.js'
+import { MAP_SIZE, METERS_PER_PIXEL, NODES } from '../data/campus.js'
+import { nodeById, pointsToPath, roads } from '../lib/graph.js'
 
 const { width: W, height: H } = MAP_SIZE
 const MAX_K = 5
@@ -16,7 +16,7 @@ const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v))
 const ease = (t) => 1 - Math.pow(1 - t, 3)
 
 export default function MapView({
-  fromId, toId, hoverId, route, alt, showRoads, focus, fullscreen, onToggleFullscreen, onPick, onHover, onClear,
+  fromId, toId, hoverId, route, alt, live, routeKey, showRoads, focus, fullscreen, onToggleFullscreen, onPick, onHover, onClear,
 }) {
   const wrapRef = useRef(null)
   const [size, setSize] = useState({ w: 0, h: 0 })
@@ -116,12 +116,12 @@ export default function MapView({
     if (!framePts || !size.w) return
     animateTo(fitPoints(framePts))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [framePts])
+  }, [routeKey]) // not framePts: a live route updates as you walk and must not re-zoom each time
 
   // Fly to a single node (picked from the step list, or the first pick).
   useEffect(() => {
     if (!focus || !size.w) return
-    const n = NODES.find((x) => x.id === focus.id)
+    const n = nodeById[focus.id]
     if (!n) return
     const k = Math.max(viewRef.current.k, 1.6)
     animateTo({ k, x: size.w / 2 - n.x * k, y: size.h / 2 - n.y * k }, 500)
@@ -221,7 +221,7 @@ export default function MapView({
   }, [route])
   const altPath = useMemo(() => (alt ? pointsToPath(alt.points) : ''), [alt])
   const onRoute = useMemo(() => new Set(route ? route.stops.map((s) => s.id) : []), [route])
-  const byId = (id) => NODES.find((n) => n.id === id)
+  const byId = (id) => nodeById[id]
   const fromNode = fromId && byId(fromId)
   const toNode = toId && byId(toId)
 
@@ -264,14 +264,14 @@ export default function MapView({
           )}
 
           {alt && (
-            <g key={altPath} className="alt-route">
+            <g key={`alt-${routeKey}`} className="alt-route">
               <path d={altPath} className="alt-casing" strokeWidth={px(10)} strokeDasharray={`0.1 ${px(13)}`} />
               <path d={altPath} className="alt-line" strokeWidth={px(6.5)} strokeDasharray={`0.1 ${px(13)}`} />
             </g>
           )}
 
           {route && (
-            <g key={routePath} className="route">
+            <g key={routeKey} className="route">
               <path d={routePath} className="route-casing" strokeWidth={px(10)} />
               <path
                 d={routePath}
@@ -295,6 +295,40 @@ export default function MapView({
                   begin="1.2s"
                 />
               </circle>
+            </g>
+          )}
+
+          {live?.fix && live.snap && (
+            <g className="live" pointerEvents="none">
+              {Math.hypot(live.fix.x - live.snap.snap.x, live.fix.y - live.snap.snap.y) > 3 && (
+                <line
+                  x1={live.fix.x}
+                  y1={live.fix.y}
+                  x2={live.snap.snap.x}
+                  y2={live.snap.snap.y}
+                  className="live-link"
+                  strokeWidth={px(3)}
+                  strokeDasharray={`${px(5)} ${px(5)}`}
+                />
+              )}
+              <circle
+                cx={live.fix.x}
+                cy={live.fix.y}
+                r={Math.min(Math.max(live.fix.accuracy / METERS_PER_PIXEL, px(14)), 120)}
+                className="live-accuracy"
+              />
+              <circle cx={live.fix.x} cy={live.fix.y} r={px(16)} className="pulse live-pulse" />
+              <circle cx={live.fix.x} cy={live.fix.y} r={px(8.5)} className="live-core" strokeWidth={px(3)} />
+              <text
+                x={live.fix.x}
+                y={live.fix.y - px(18)}
+                fontSize={px(13)}
+                textAnchor="middle"
+                className="label strong"
+                strokeWidth={px(4)}
+              >
+                {toId ? 'START · You are here' : 'You are here'}
+              </text>
             </g>
           )}
 

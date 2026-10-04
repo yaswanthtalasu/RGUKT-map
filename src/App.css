@@ -87,6 +87,14 @@ button { cursor: pointer; }
   margin: 0; padding: 10px 12px; border-radius: 10px;
   background: #ecf6f4; color: var(--brand-dark); font-size: 13px; line-height: 1.45;
 }
+.hint-box p { margin: 0 0 10px; }
+.live-btn {
+  width: 100%; border: 0; border-radius: 10px; padding: 10px 12px; font-weight: 700; font-size: 14px;
+  color: #fff; background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+}
+.live-btn:active { transform: translateY(1px); }
+.hint-box.live { display: flex; align-items: center; gap: 8px; background: #e8f1ff; color: #1e4fb3; }
+.live-dot { flex: none; width: 10px; height: 10px; border-radius: 50%; background: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.25); }
 .hint-box.warn { background: #fdecec; color: #8a1c1c; }
 
 .steps { list-style: none; margin: 0; padding: 0; position: relative; }
@@ -150,6 +158,10 @@ button { cursor: pointer; }
 .pulse { fill: none; stroke-width: 2; animation: pulse 1.8s ease-out infinite; transform-box: fill-box; transform-origin: center; }
 .pulse.from { stroke: var(--from); }
 .pulse.to { stroke: var(--to); }
+.live-pulse { stroke: #2563eb; }
+.live-core { fill: #2563eb; stroke: #fff; }
+.live-accuracy { fill: rgba(37, 99, 235, 0.14); stroke: rgba(37, 99, 235, 0.35); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.live-link { stroke: #2563eb; stroke-linecap: round; opacity: 0.8; }
 
 .label {
   fill: #0d2b29; stroke: rgba(255, 255, 255, 0.95); paint-order: stroke; stroke-linejoin: round;
