@@ -344,8 +344,8 @@ export default function MapView({ fromId, toId, hoverId, route, showRoads, focus
       </div>
 
       <div className="zoom-controls">
-        <button aria-label="Zoom in" onClick={() => zoomAt(size.w / 2, size.h / 2, 1.5)}>＋</button>
-        <button aria-label="Zoom out" onClick={() => zoomAt(size.w / 2, size.h / 2, 1 / 1.5)}>－</button>
+        <button className="zoom-btn" aria-label="Zoom in" onClick={() => zoomAt(size.w / 2, size.h / 2, 1.5)}>＋</button>
+        <button className="zoom-btn" aria-label="Zoom out" onClick={() => zoomAt(size.w / 2, size.h / 2, 1 / 1.5)}>－</button>
         <button
           aria-label="Reset view"
           onClick={() => {

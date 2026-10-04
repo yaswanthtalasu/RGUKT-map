@@ -185,4 +185,7 @@ button { cursor: pointer; }
   .brand-mark { width: 34px; height: 34px; font-size: 16px; border-radius: 10px; }
   .brand h1 { font-size: 16px; }
   .legend { display: none; }
+  /* phones pinch to zoom: drop +/- and park the full-view button at the bottom of the map */
+  .zoom-btn { display: none; }
+  .zoom-controls { top: auto; bottom: 14px; }
 }

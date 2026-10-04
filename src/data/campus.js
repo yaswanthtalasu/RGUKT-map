@@ -15,7 +15,7 @@ export const WALK_METERS_PER_MIN = 75
 
 export const NODES = [
   // ── Entrance & academic blocks ─────────────────────────────
-  { id: 'gate', name: 'Main Gate (Entry)', type: 'gate', x: 499, y: 1004 },
+  { id: 'gate', name: 'Main Gate Circle', type: 'gate', x: 499, y: 1004 },
   { id: 'a4', name: 'AB1 Block', type: 'building', x: 424, y: 896 },
   { id: 'acj', name: 'Academic Junction', type: 'junction', x: 424, y: 841 },
   { id: 'a3', name: 'AB2 Block', type: 'building', x: 407, y: 783 },
