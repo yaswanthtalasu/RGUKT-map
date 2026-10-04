@@ -16,11 +16,11 @@ export const WALK_METERS_PER_MIN = 75
 export const NODES = [
   // ── Entrance & academic blocks ─────────────────────────────
   { id: 'gate', name: 'Main Gate (Entry)', type: 'gate', x: 499, y: 1004 },
-  { id: 'a4', name: 'A4 Block', type: 'building', x: 424, y: 896 },
+  { id: 'a4', name: 'AB1 Block', type: 'building', x: 424, y: 896 },
   { id: 'acj', name: 'Academic Junction', type: 'junction', x: 424, y: 841 },
-  { id: 'a3', name: 'A3 Block', type: 'building', x: 407, y: 783 },
+  { id: 'a3', name: 'AB2 Block', type: 'building', x: 407, y: 783 },
   { id: 'acy', name: 'Academic Courtyard', type: 'ground', x: 440, y: 733 },
-  { id: 'a2', name: 'Academic Block (North)', type: 'building', x: 488, y: 673 },
+  { id: 'a2', name: 'AB3 Block', type: 'building', x: 488, y: 673 },
   { id: 'r1', type: 'hidden', x: 500, y: 750 },
   { id: 'r2', type: 'hidden', x: 540, y: 700 },
 
@@ -51,7 +51,6 @@ export const NODES = [
   { id: 'gh2', name: 'Girls Hostel – 2', type: 'building', x: 1278, y: 454 },
   { id: 'gh3', name: 'Girls Hostel – 3', type: 'building', x: 1422, y: 491 },
   { id: 'sac', name: 'SAC Auditorium', type: 'building', x: 1249, y: 348 },
-  { id: 'sacg', name: 'SAC Grounds', type: 'ground', x: 1290, y: 357 },
   { id: 'er', name: 'East Road (Pond Side)', type: 'junction', x: 1515, y: 400 },
 
   // ── South campus ───────────────────────────────────────────
@@ -104,7 +103,6 @@ export const EDGES = [
   ['gh2', 'gh3'],
   ['gh3', 'er', [[1460, 497], [1500, 500], [1507, 450]]],
   ['gh2', 'sac', [[1268, 415]]],
-  ['sac', 'sacg'],
 
   // South campus
   ['yj', 's1', [[950, 540], [918, 560], [908, 650], [893, 760]]],
