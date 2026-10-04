@@ -51,7 +51,6 @@ export const NODES = [
   { id: 'gh2', name: 'Girls Hostel – 2', type: 'building', x: 1278, y: 454 },
   { id: 'gh3', name: 'Girls Hostel – 3', type: 'building', x: 1422, y: 491 },
   { id: 'sac', name: 'SAC Auditorium', type: 'building', x: 1249, y: 348 },
-  { id: 'er', name: 'East Road (Pond Side)', type: 'junction', x: 1515, y: 400 },
 
   // ── South campus ───────────────────────────────────────────
   { id: 's1', name: 'South Campus – West Gate', type: 'building', x: 880, y: 840 },
@@ -101,7 +100,6 @@ export const EDGES = [
   ['gj', 'gh1'],
   ['gh1', 'gh2', [[1205, 433]]],
   ['gh2', 'gh3'],
-  ['gh3', 'er', [[1460, 497], [1500, 500], [1507, 450]]],
   ['gh2', 'sac', [[1268, 415]]],
 
   // South campus
