@@ -30,7 +30,7 @@ export const NODES = [
   { id: 'lib', name: 'Central Library', type: 'building', x: 493, y: 493 },
   { id: 'fs', type: 'hidden', x: 652, y: 454 },
   { id: 'din', name: 'Dining Hall', type: 'building', x: 560, y: 418 },
-  { id: 'pj', name: 'Pond Junction', type: 'junction', x: 744, y: 491 },
+  { id: 'pj', type: 'hidden', x: 744, y: 491 },
   { id: 'adm', name: 'Administration Block (I3)', type: 'building', x: 841, y: 497 },
   { id: 'hos', name: 'IIIT Hospital', type: 'building', x: 911, y: 491 },
   { id: 'yj', name: 'Yogasala Road Junction', type: 'junction', x: 994, y: 534 },
